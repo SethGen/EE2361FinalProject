@@ -371,12 +371,27 @@ void ST7735_initR(void) {
 	LCD_CS = 1;
 }
 
-void ST7735_drawString(unsigned char x, unsigned char y, char *c, unsigned int color, unsigned char size)
+void ST7735_drawString(unsigned char x, unsigned char y, char c[], unsigned int color, unsigned char size)
 {
-	while (c[0] != 0) {
-		ST7735_drawChar(x, y, c[0], color, size);
+    int i = 0;
+	while (c[i] != '~') {
+		ST7735_drawChar(x, y, c[i], color, size);
 		x += size*6;
-		c++;
+		i++;
+		if (x + 5 >= SCREEN_WIDTH) {
+			y += 10;
+			x = 0;
+		}
+	}
+}
+
+void ST7735_drawStringH(unsigned char x, unsigned char y, char c[], unsigned int color, unsigned char size)
+{
+    int i = 0;
+	while (c[i] != '~') {
+		ST7735_drawCharH(y, x, c[i], color, size);
+		x += size*6;
+		i++;
 		if (x + 5 >= SCREEN_WIDTH) {
 			y += 10;
 			x = 0;
@@ -385,6 +400,27 @@ void ST7735_drawString(unsigned char x, unsigned char y, char *c, unsigned int c
 }
 
 void ST7735_drawChar(unsigned char x, unsigned char y, char c, unsigned int color, unsigned char size)
+{
+	unsigned char i, j;
+
+	unsigned char letter = c < 0x52 ? c - 0x20 : c - 0x52;
+	for (i =0; i<5; i++ ) {
+		unsigned char line = c < 0x52 ? Alpha1[letter*5+i] : Alpha2[letter*5+i];
+
+		for (j = 0; j<8; j++) {
+			if (line & 0x1) {
+				if (size == 1) // default size
+				ST7735_drawPixel(x+i, y+j, color);
+				else {  // big size
+					ST7735_fillRect(x+i*size, y+j*size, size, size, color);
+				} 
+			}
+			line >>= 1;
+		}
+	}
+}
+
+void ST7735_drawCharH(unsigned char x, unsigned char y, char c, unsigned int color, unsigned char size)
 {
 	unsigned char i, j;
 
@@ -588,6 +624,37 @@ unsigned int color) {
 			err += dx;
 		}
 	}
+}
+
+void menu(void){
+    int i;
+    ST7735_drawRect(7,8,120,152,menuCol);              //Box Outline
+    char vert[30] = "     Voltage(dBV)~";
+    char hori[30] = "       Frequency Hz~";
+    //ST7735_setRotation(0xC0);         //Default View
+    
+    //Markers Initialization
+    //Voltage Markers
+    for(i = 0;i <= 120; i+=12){
+        if(i==60)
+            ST7735_fillRect(7+i,8,1,152,menuCol2);
+        else
+            ST7735_fillRect(7+i,8,1,4,menuCol2);
+    }
+    //Frequency Markers
+    for(i = 0;i <= 152; i+=15){
+        ST7735_fillRect(7,8+i,4,1,menuCol2);
+    }
+    //
+    ST7735_drawString(0, 0, vert, menuCol, 1);
+    ST7735_drawStringH(0, 0, hori, menuCol, 1);
+}
+
+void plotData(unsigned char vADC[152]){
+    int i;
+    for(i =0; i<152; i++){
+        ST7735_fillRect(7,8+i,vADC[i],1,menuCol);
+    }
 }
 
 /*
