@@ -25,17 +25,35 @@
                                        // Fail-Safe Clock Monitor is enabled)
 #pragma config FNOSC = FRCPLL      // Oscillator Select (Fast RC Oscillator with PLL module (FRCPLL))
 //End of Boilerplate Code
-
-
+void setup(void){
+    CLKDIVbits.RCDIV = 0;  //Set RCDIV=1:1 (default 2:1) 32MHz or FCY/2=16M
+    //Digital Port Initialization
+    AD1PCFG = 0x9fff;
+    TRISA = 0xffff;
+    TRISB = 0x9fff;
+    TRISAbits.TRISA0 = 0;
+    TRISAbits.TRISA1 = 0;
+    TRISBbits.TRISB5 = 0;
+    TRISBbits.TRISB6 = 0;
+    TRISBbits.TRISB7 = 0;
+}
 
 
 int main(void) {
-    ST7735_initB();
+    setup();
     ST7735_initR();
-    ST7735_fillScreen(colGreen);
+    ST7735_fillScreen(colBlack);
+    unsigned char data[152];                    //data of values between 0 and 120
+    int i = 0;
+    while(i<152){
+        data[i] = 120-i%120;
+        i++;
+    }
     
+    plotData(data);
+    menu();
     while(1){
-        ST7735_fillCircle(25, 50, 30, colBlack);
+                
     }
     return 0;
 }
