@@ -26,6 +26,12 @@
                                        // Fail-Safe Clock Monitor is enabled)
 #pragma config FNOSC = FRCPLL      // Oscillator Select (Fast RC Oscillator with PLL module (FRCPLL))
 //End of Boilerplate Code
+volatile unsigned int ADC1BUFMAX[plotSamples];
+volatile unsigned int ADCdata[plotSamples]; 
+volatile unsigned int i = 0;
+
+
+
 void setup(void){
     CLKDIVbits.RCDIV = 0;  //Set RCDIV=1:1 (default 2:1) 32MHz or FCY/2=16M
     //Digital Port Initialization
@@ -37,24 +43,51 @@ void setup(void){
     TRISBbits.TRISB5 = 0;
     TRISBbits.TRISB6 = 0;
     TRISBbits.TRISB7 = 0;
+    T3CON = 0x8030; //Stop Timer, Tcy clk source, PRE 1:8
+    TMR3 = 0;     // Initialize to zero
+    PR3 = 61; //  (20 ms with 8:1 PRE )
 }
 
+
+
+void initArray(unsigned int arr[]){
+    int l;
+    for(l=0;l<plotSamples;l++){
+        arr[l] = 0;
+    }
+}
+
+
+void updateTimer(unsigned int i){
+    PR3 = 61*(50-i);
+}
+
+void __attribute__((interrupt,auto_psv)) _T2Interrupt(void)
+{
+    IFS0bits.T2IF = 0;
+    ADCdata[i] = ADC1BUFMAX[i];
+    i++;
+}
 
 int main(void) {
     setup();
     ST7735_initR();
     ST7735_fillScreen(colBlack);
+    //initArray(ADC1BUFMAX);
+    //initArray(ADCdata);
     unsigned int data[150];                    //data of values between 0 and 120
-    int i = 0;
-    while(i<plotSamples){
-        data[i] = 1023-(10*i);
-        i++;
+    int q = 0;
+    while(q<plotSamples){
+        data[q] = 1023-20*q;
+        if(data[q]<=0)
+            data[q]=0;
+        q++;
     }
     makeDBV(data);
     plotData(data);
     menu();
     while(1){
-                
+        
     }
     return 0;
 }
