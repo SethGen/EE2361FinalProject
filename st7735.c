@@ -670,7 +670,7 @@ void makeDBV(unsigned int vADC1[150]){
     float test2;
     unsigned int test1;
     for(i=0;i<plotSamples;i++){
-        dBV[i] = 20*log10(3.3 * ((float)vADC1[i]+1/1024.0));        //Convert 10-Bit Voltage to dBV (Range(dBV): (-50,10))
+        dBV[i] = 20*log10(3.3 * (((float)vADC1[i]+1)/1024.0));        //Convert 10-Bit Voltage to dBV (Range(dBV): (-50,10))
         test1 = vADC1[i];
         test2 = dBV[i];
         dBV[i] = (dBV[i]+50)*2;                               //Vertically shift to make dBV positive and scale for vertical pixels 
