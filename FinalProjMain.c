@@ -9,6 +9,7 @@
 //Boilerplate Code
 #include "xc.h" 
 #include "colors.h"
+#include "st7735.h"
 // CW1: FLASH CONFIGURATION WORD 1 (see PIC24 Family Reference Manual 24.1)
 #pragma config ICS = PGx1          // Comm Channel Select (Emulator EMUC1/EMUD1 pins are shared with PGC1/PGD1)
 #pragma config FWDTEN = OFF        // Watchdog Timer Enable (Watchdog Timer is disabled)
@@ -43,13 +44,13 @@ int main(void) {
     setup();
     ST7735_initR();
     ST7735_fillScreen(colBlack);
-    unsigned char data[152];                    //data of values between 0 and 120
+    unsigned int data[150];                    //data of values between 0 and 120
     int i = 0;
-    while(i<152){
-        data[i] = 120-i%120;
+    while(i<plotSamples){
+        data[i] = 1023-(10*i);
         i++;
     }
-    
+    makeDBV(data);
     plotData(data);
     menu();
     while(1){
