@@ -82,8 +82,11 @@ TFT 	PinNum	Pindesc
 
 
 //Menu Config
-#define menuCol colRed
-#define menuCol2 colBlue
+#define menuCol colMaroon
+#define menuCol2 colGold
+
+//Other Definitions
+#define plotSamples 50
 
 void setAddrWindow(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1);
 void ST7735_pushColor(unsigned int color); // for what?
@@ -105,7 +108,8 @@ void ST7735_drawFastLine(unsigned char x, unsigned char y, unsigned char length,
 void ST7735_drawLine(int x0, int y0, int x1, int y1, unsigned int color);
 unsigned char ST7735_getRotation();
 void menu(void);
-void plotData(unsigned char[]);
+void makeDBV(unsigned int[]);
+void plotData(unsigned int[]);
 void loadBitmapToLCD(char* filename);
 
 
