@@ -112,4 +112,3 @@ void makeDBV(unsigned int[]);
 void plotData(unsigned int[]);
 void loadBitmapToLCD(char* filename);
 
-
