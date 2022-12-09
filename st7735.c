@@ -4,7 +4,7 @@
 //#include "MDD File System/FSIO.h"
 //#include "uart.h"
 #include "colors.h"
-
+#include <math.h>
 char madctl;
 
 void delay_us(int d){
@@ -628,32 +628,53 @@ unsigned int color) {
 
 void menu(void){
     int i;
-    ST7735_drawRect(7,8,120,152,menuCol);              //Box Outline
-    char vert[30] = "     Voltage(dBV)~";
-    char hori[30] = "       Frequency Hz~";
+    ST7735_drawRect(7,8,120,150,menuCol);              //Box Outline
+    char vert[30] = "     Voltage(dBV)~   ";
+    char hori[30] = "      Frequency Hz~  ";
+    char vert1[30] = "-50                10~";
+    char hori1[50] = "  1                ~";
+    unsigned char hori2[50] = "5K~";
     //ST7735_setRotation(0xC0);         //Default View
     
     //Markers Initialization
     //Voltage Markers
-    for(i = 0;i <= 120; i+=12){
+    for(i = 0;i <= 120; i+=20){
         if(i==60)
             ST7735_fillRect(7+i,8,1,152,menuCol2);
         else
             ST7735_fillRect(7+i,8,1,4,menuCol2);
     }
     //Frequency Markers
-    for(i = 0;i <= 152; i+=15){
+    for(i = 0;i <= 150; i+=15){
         ST7735_fillRect(7,8+i,4,1,menuCol2);
     }
     //
     ST7735_drawString(0, 0, vert, menuCol, 1);
+    ST7735_drawString(1, 0, vert1, menuCol2, 1);
     ST7735_drawStringH(0, 0, hori, menuCol, 1);
+    ST7735_drawStringH(0, 0, hori1, menuCol2, 1);
+    ST7735_drawString(0, 152, hori2, menuCol2, 1);
 }
 
-void plotData(unsigned char vADC[152]){
+void plotData(unsigned int vADC[150]){
     int i;
-    for(i =0; i<152; i++){
-        ST7735_fillRect(7,8+i,vADC[i],1,menuCol);
+    for(i =0; i<(plotSamples); i++){
+        ST7735_fillRect(7,8+((150/plotSamples)*i),vADC[i],(150/plotSamples),menuCol);
+    }
+}
+
+
+void makeDBV(unsigned int vADC1[150]){
+    int i;
+    float dBV[150];
+    float test2;
+    unsigned int test1;
+    for(i=0;i<plotSamples;i++){
+        dBV[i] = 20*log10(3.3 * ((float)vADC1[i]+1/1024.0));        //Convert 10-Bit Voltage to dBV (Range(dBV): (-50,10))
+        test1 = vADC1[i];
+        test2 = dBV[i];
+        dBV[i] = (dBV[i]+50)*2;                               //Vertically shift to make dBV positive and scale for vertical pixels 
+        vADC1[i] = (unsigned int)dBV[i];                                      //Convert float to unsigned char
     }
 }
 
@@ -736,3 +757,4 @@ void loadBitmapToLCD(char* filename)
 
 	FSfclose (pointer);
 }*/
+
