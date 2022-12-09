@@ -629,18 +629,18 @@ unsigned int color) {
 void menu(void){
     int i;
     ST7735_drawRect(7,8,120,150,menuCol);              //Box Outline
-    char vert[30] = "     Voltage(dBV)~   ";
-    char hori[30] = "      Frequency Hz~  ";
-    char vert1[30] = "-50                10~";
-    char hori1[50] = "  1                ~";
-    unsigned char hori2[50] = "5K~";
-    //ST7735_setRotation(0xC0);         //Default View
+    char vert[30] = "     Voltage(dBV)~   ";           //Outside-Graph Text y-title
+    char hori[30] = "       Frequency Hz~  ";          //x-title
+    char vert1[30] = "-20                10~";         //y min and y max
+    char hori1[50] = " 20                ~";           //x min and x max
+    unsigned char hori2[50] = "7K~";
+    //ST7735_setRotation(0xC0);                        //Default Rotation
     
     //Markers Initialization
     //Voltage Markers
-    for(i = 0;i <= 120; i+=20){
-        if(i==60)
-            ST7735_fillRect(7+i,8,1,152,menuCol2);
+    for(i = 0;i <= 120; i+=40){
+        if(i==80)
+            ST7735_fillRect(7+i,8,1,150,menuCol2);
         else
             ST7735_fillRect(7+i,8,1,4,menuCol2);
     }
@@ -664,18 +664,22 @@ void plotData(unsigned int vADC[150]){
 }
 
 
-void makeDBV(unsigned int vADC1[150]){
+void makeDBV(unsigned int vADC[150]){
     int i;
-    float dBV[150];
+    float dBV;
     float test2;
     unsigned int test1;
     for(i=0;i<plotSamples;i++){
-        dBV[i] = 20*log10(3.3 * (((float)vADC1[i]+1)/1024.0));        //Convert 10-Bit Voltage to dBV (Range(dBV): (-50,10))
-        test1 = vADC1[i];
-        test2 = dBV[i];
-        dBV[i] = (dBV[i]+50)*2;                               //Vertically shift to make dBV positive and scale for vertical pixels 
-        vADC1[i] = (unsigned int)dBV[i];                                      //Convert float to unsigned char
-    }
+        dBV = 20*log10(3.3 * ((float)(vADC[i]+1)/1024.0));        //Convert 10-Bit Voltage to dBV (Range(dBV): (-50,10))
+        test1 = vADC[i];
+        test2 = dBV;
+        dBV = (dBV+20)*4;                               //Vertically shift to make dBV positive and scale for vertical pixels 
+        if(dBV<0){
+            vADC[i] = 0;
+        }
+        else
+            vADC[i] = (unsigned int)dBV;                         //Convert float to unsigned char
+      }
 }
 
 /*
@@ -757,4 +761,3 @@ void loadBitmapToLCD(char* filename)
 
 	FSfclose (pointer);
 }*/
-
