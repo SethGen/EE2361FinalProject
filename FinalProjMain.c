@@ -1,9 +1,4 @@
-/*
- * File:   FinalProjMain.c
- * Author: Seth
- *
- * Created on December 2, 2022, 6:01 AM
- */
+//Program explanation
 
 
 //Boilerplate Code
@@ -151,20 +146,9 @@ int main(void) {
     menu();
     setup_ADC();
     
+   
     
-    unsigned int data[150];
-    unsigned int data2[150];
-    //data of values between 0 and 120
-    int q = 0;
-    while(q<plotSamples){
-        data[q] = 1023-20*q;
-        if(data[q]<=0)
-            data[q]=0;
-        q++;
-    }
-
-    
-    PORTBbits.RB14 = 0;
+    PORTBbits.RB14 = 0;         //Signal Sent to other PIC24
     delay_ms(100);
 
     while(1){
